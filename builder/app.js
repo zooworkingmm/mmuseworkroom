@@ -374,16 +374,18 @@
     if (el) el.textContent = text;
   }
 
-  function setGenerateProgress(pct) {
+  function setGenerateProgress(active) {
     const wrap = document.getElementById("generateProgress");
-    const bar = document.getElementById("generateProgressBar");
-    if (!wrap || !bar) return;
-    if (pct == null) {
-      wrap.hidden = true;
-      return;
-    }
-    wrap.hidden = false;
-    bar.style.width = Math.max(0, Math.min(100, pct)) + "%";
+    if (!wrap) return;
+    wrap.hidden = !active;
+  }
+
+  function formatElapsed(seconds) {
+    const s = Math.max(0, Math.round(seconds));
+    if (s < 60) return s + "초";
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return m + "분 " + r + "초";
   }
 
   // ---------- Generate modal ----------
@@ -473,7 +475,7 @@
       return;
     }
     setGenerateStatus("요청됨 — 이 창을 열어둔 Claude Code 세션이 처리합니다...");
-    setGenerateProgress(0);
+    setGenerateProgress(true);
     generatePollTimer = setInterval(() => pollGenerate(project.id), 3000);
     pollGenerate(project.id);
   }
@@ -487,20 +489,20 @@
       return;
     }
     if (data.status === "pending") {
-      const pct = typeof data.progress === "number" ? data.progress : 0;
-      setGenerateProgress(pct);
-      setGenerateStatus((data.step || "처리 대기/진행 중...") + " (" + pct + "%)");
+      const elapsed = typeof data.requestedAt === "number" ? Date.now() / 1000 - data.requestedAt : null;
+      setGenerateProgress(true);
+      setGenerateStatus((data.step || "처리 중...") + (elapsed != null ? " (" + formatElapsed(elapsed) + " 경과)" : ""));
       return;
     }
     if (data.status === "error") {
-      setGenerateProgress(null);
+      setGenerateProgress(false);
       setGenerateStatus("실패: " + (data.error || "알 수 없는 오류"));
       clearInterval(generatePollTimer);
       generatePollTimer = null;
       return;
     }
     if (data.status === "done") {
-      setGenerateProgress(100);
+      setGenerateProgress(false);
       clearInterval(generatePollTimer);
       generatePollTimer = null;
       const project = state.projects.find((p) => p.id === projectId);

@@ -260,9 +260,15 @@ input, textarea{ font-family:inherit; color:inherit; }
 .b-generate-progress .bar{
   display:block;
   height:100%;
-  width:0%;
+  width:40%;
   background:var(--ink);
-  transition:width .3s ease;
+  animation:genProgressPulse 1.1s ease-in-out infinite;
+}
+
+@keyframes genProgressPulse{
+  0%{ margin-left:0%; }
+  50%{ margin-left:60%; }
+  100%{ margin-left:0%; }
 }
 
 /* ---------- CENTER : editor ---------- */
@@ -816,6 +822,16 @@ input, textarea{ font-family:inherit; color:inherit; }
   color:var(--bg);
 }
 .gen-pill.active span{ color:#c7c7c0; }
+
+.gen-pill-add{
+  width:34px;
+  text-align:center;
+  padding:8px 0;
+  font-weight:700;
+  color:var(--sub);
+  border-style:dashed;
+}
+.gen-pill-add:hover{ color:var(--ink); border-color:var(--ink); }
 
 .gen-section textarea{
   width:100%;
