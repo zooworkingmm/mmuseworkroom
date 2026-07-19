@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Portfolio Builder</title>
-<link rel="stylesheet" href="style.css?v=8" />
+<link rel="stylesheet" href="style.css?v=9" />
 </head>
 <body>
 
@@ -18,13 +18,51 @@
         <p class="b-sub">폴더의 사진으로 상세 페이지를 만듭니다</p>
       </header>
 
-      <button type="button" class="b-btn b-btn-new" id="btnNewProject">+ 새 프로젝트</button>
+      <div class="b-tabs">
+        <button type="button" class="b-tab active" id="tabBtnProjects" data-tab="projects">프로젝트</button>
+        <button type="button" class="b-tab" id="tabBtnIntro" data-tab="intro">소개</button>
+      </div>
 
-      <nav class="b-projects" id="projectList"></nav>
+      <div class="b-tab-panel" id="tabProjects">
+        <button type="button" class="b-btn b-btn-new" id="btnNewProject">+ 새 프로젝트</button>
 
-      <div class="b-pending" id="pendingSection" hidden>
-        <p class="b-pending-title">새 폴더 발견</p>
-        <div class="b-pending-list" id="pendingList"></div>
+        <nav class="b-projects" id="projectList"></nav>
+
+        <div class="b-pending" id="pendingSection" hidden>
+          <p class="b-pending-title">새 폴더 발견</p>
+          <div class="b-pending-list" id="pendingList"></div>
+        </div>
+      </div>
+
+      <div class="b-tab-panel" id="tabIntro" hidden>
+        <div class="b-field">
+          <label>스튜디오명</label>
+          <input type="text" id="s-name" />
+        </div>
+        <div class="b-field">
+          <label>역할</label>
+          <input type="text" id="s-role" />
+        </div>
+        <div class="b-field">
+          <label>주소</label>
+          <input type="text" id="s-address" />
+        </div>
+        <div class="b-field">
+          <label>전화번호</label>
+          <input type="text" id="s-phone" />
+        </div>
+        <div class="b-field">
+          <label>이메일</label>
+          <input type="text" id="s-email" />
+        </div>
+        <div class="b-field">
+          <label>웹사이트</label>
+          <input type="text" id="s-site" />
+        </div>
+        <div class="b-field">
+          <label>SNS</label>
+          <input type="text" id="s-sns" />
+        </div>
       </div>
 
       <div class="b-side-foot">
@@ -134,7 +172,7 @@
   </div>
 </div>
 
-<script src="../assets/data.js?v=8"></script>
-<script src="app.js?v=8"></script>
+<script src="../assets/data.js?v=9"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

@@ -90,6 +90,26 @@ input, textarea{ font-family:inherit; color:inherit; }
 
 .b-btn:hover{ background:var(--ink); color:var(--bg); }
 
+.b-tabs{
+  display:flex;
+  gap:4px;
+  margin-bottom:18px;
+}
+
+.b-tab{
+  flex:1;
+  border:1px solid var(--ink);
+  background:none;
+  color:var(--ink);
+  padding:7px 0;
+  font-size:10.5px;
+  letter-spacing:0.02em;
+  cursor:pointer;
+}
+.b-tab.active{ background:var(--ink); color:var(--bg); }
+
+.b-tab-panel[hidden]{ display:none; }
+
 .b-btn-new{ margin-bottom:20px; }
 
 .b-projects{
@@ -226,6 +246,23 @@ input, textarea{ font-family:inherit; color:inherit; }
 .b-generate-status{
   font-size:9.5px;
   color:var(--sub);
+}
+
+.b-generate-progress{
+  display:inline-block;
+  width:70px;
+  height:6px;
+  border:1px solid var(--ink);
+  vertical-align:middle;
+}
+.b-generate-progress[hidden]{ display:none; }
+
+.b-generate-progress .bar{
+  display:block;
+  height:100%;
+  width:0%;
+  background:var(--ink);
+  transition:width .3s ease;
 }
 
 /* ---------- CENTER : editor ---------- */

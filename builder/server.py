@@ -340,6 +340,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         os.makedirs(JOBS_DIR, exist_ok=True)
         job = {
             "status": "pending",
+            "progress": 0,
+            "step": "대기 중 — Claude Code 세션이 감지하면 시작됩니다",
             "projectId": project_id,
             "hints": payload.get("hints", {}),
             "requestedAt": time.time(),

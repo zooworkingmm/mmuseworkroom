@@ -26,6 +26,37 @@
   modeDesktop.addEventListener("click", () => setPreviewMode("desktop"));
   modeMobile.addEventListener("click", () => setPreviewMode("mobile"));
 
+  // ---------- LEFT : 프로젝트 / 소개 탭 ----------
+
+  const tabProjects = document.getElementById("tabProjects");
+  const tabIntro = document.getElementById("tabIntro");
+  document.querySelectorAll(".b-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".b-tab").forEach((b) => b.classList.toggle("active", b === btn));
+      const showIntro = btn.dataset.tab === "intro";
+      tabProjects.hidden = showIntro;
+      tabIntro.hidden = !showIntro;
+    });
+  });
+
+  const studioFieldMap = {
+    "s-name": "name",
+    "s-role": "role",
+    "s-address": "address",
+    "s-phone": "phone",
+    "s-email": "email",
+    "s-site": "site",
+    "s-sns": "sns",
+  };
+  Object.keys(studioFieldMap).forEach((id) => {
+    const key = studioFieldMap[id];
+    const input = document.getElementById(id);
+    input.value = state.studio[key] || "";
+    input.addEventListener("input", (e) => {
+      state.studio[key] = e.target.value;
+    });
+  });
+
   function pad2(n) {
     return String(n + 1).padStart(2, "0");
   }
@@ -241,6 +272,7 @@
         <p style="color:var(--sub);font-size:10px;margin:0;">ID: ${escapeHtml(project.id)}</p>
         <button type="button" class="b-btn b-btn-generate" id="btnGenerate">✦ Generate</button>
         <button type="button" class="b-btn b-btn-publish-project" id="btnPublishProject">Publish</button>
+        <span class="b-generate-progress" id="generateProgress" hidden><span class="bar" id="generateProgressBar"></span></span>
         <span class="b-generate-status" id="generateStatus"></span>
       </div>
 
@@ -342,6 +374,18 @@
     if (el) el.textContent = text;
   }
 
+  function setGenerateProgress(pct) {
+    const wrap = document.getElementById("generateProgress");
+    const bar = document.getElementById("generateProgressBar");
+    if (!wrap || !bar) return;
+    if (pct == null) {
+      wrap.hidden = true;
+      return;
+    }
+    wrap.hidden = false;
+    bar.style.width = Math.max(0, Math.min(100, pct)) + "%";
+  }
+
   // ---------- Generate modal ----------
 
   const genOverlay = document.getElementById("genOverlay");
@@ -429,6 +473,7 @@
       return;
     }
     setGenerateStatus("요청됨 — 이 창을 열어둔 Claude Code 세션이 처리합니다...");
+    setGenerateProgress(0);
     generatePollTimer = setInterval(() => pollGenerate(project.id), 3000);
     pollGenerate(project.id);
   }
@@ -442,16 +487,20 @@
       return;
     }
     if (data.status === "pending") {
-      setGenerateStatus("처리 대기/진행 중...");
+      const pct = typeof data.progress === "number" ? data.progress : 0;
+      setGenerateProgress(pct);
+      setGenerateStatus((data.step || "처리 대기/진행 중...") + " (" + pct + "%)");
       return;
     }
     if (data.status === "error") {
+      setGenerateProgress(null);
       setGenerateStatus("실패: " + (data.error || "알 수 없는 오류"));
       clearInterval(generatePollTimer);
       generatePollTimer = null;
       return;
     }
     if (data.status === "done") {
+      setGenerateProgress(100);
       clearInterval(generatePollTimer);
       generatePollTimer = null;
       const project = state.projects.find((p) => p.id === projectId);
@@ -675,7 +724,7 @@
         const itemsHtml = group.items
           .map((img) => {
             const isFirst = globalIndex === 0;
-            const capText = img.body || img.caption || (isFirst ? project.summary : "");
+            const capText = img.body || (isFirst ? project.summary : "");
             const isVideo = img.type === "video" || /\.(mp4|mov|m4v|webm)$/i.test(img.src);
             const mediaHtml = isVideo
               ? `<video src="${img.src}" controls muted></video>`
