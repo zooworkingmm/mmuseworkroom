@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OOO — Interior Portfolio</title>
+<link rel="stylesheet" href="style.css?v=52" />
+</head>
+<body>
+
+<div class="cursor-dot" id="cursorDot">
+  <span class="cursor-square"></span>
+</div>
+<div class="cursor-tip" id="cursorTip">
+  <span class="cursor-tip-hint">?</span>
+  <p class="cursor-tip-text" id="cursorTipText"></p>
+</div>
+<div class="scroll-dot" id="scrollDot"></div>
+
+<div class="layout">
+
+  <!-- LEFT : intro + project list -->
+  <aside class="side">
+    <div class="side-inner">
+
+      <header class="side-block">
+        <h1 class="studio-name" id="studioName">OOO</h1>
+        <p class="line" id="studioRole">INTERIOR DESIGNER</p>
+      </header>
+
+      <section class="side-block">
+        <p class="line" id="studioAddress">서울특별시 OO구 OO로 00</p>
+        <p class="line">PHONE <span id="studioPhone">010.0000.0000</span></p>
+        <p class="line">EMAIL <span id="studioEmail">INFO@SAMPLE.COM</span></p>
+        <p class="line"><a class="link" id="studioSite" href="#">WWW.SAMPLE.SITE</a></p>
+        <p class="line"><span id="studioSns">@SAMPLE</span></p>
+      </section>
+
+      <section class="side-block work-block">
+        <nav class="work-list" id="workList"></nav>
+      </section>
+
+    </div>
+  </aside>
+
+  <!-- CENTER : project info + photos -->
+  <main class="viewer-center">
+
+    <div class="viewer-meta">
+      <span class="meta-name" id="metaName">AP TOWER</span>
+    </div>
+
+    <div class="viewer-facts" id="viewerFacts"></div>
+
+    <div class="viewer-feed" id="viewerFeed"></div>
+
+    <footer class="viewer-footer">
+      <p class="line">ⓒ 2026 ALL RIGHTS RESERVED</p>
+    </footer>
+
+  </main>
+
+</div>
+
+<script src="../assets/data.js?v=52"></script>
+<script src="script.js?v=52"></script>
+</body>
+</html>

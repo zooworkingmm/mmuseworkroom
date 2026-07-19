@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AP TOWER — OOO Interior Portfolio</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav">
+    <a href="index.html">← INDEX</a>
+    <span id="studioTag">OOO INTERIOR</span>
+  </nav>
+
+  <header class="pageHead">
+    <div>
+      <div class="no" id="projNo">NO. 01</div>
+      <div class="title" id="projTitle">AP TOWER</div>
+    </div>
+    <div class="meta">
+      TYPE&nbsp; <b id="projTypeMeta"></b><br>
+      YEAR&nbsp; <b id="projYearMeta"></b><br>
+      LOC&nbsp;&nbsp; <b id="projLocMeta"></b>
+    </div>
+  </header>
+  <div class="pageHead-rule"></div>
+
+  <section class="introRow">
+    <div></div>
+    <p id="projIntro"></p>
+  </section>
+
+  <section class="frameTable" id="frameTable"></section>
+
+  <footer class="projFooter">
+    <a id="prevLink" href="#"></a>
+    <a href="index.html">INDEX</a>
+    <a id="nextLink" href="#"></a>
+  </footer>
+
+</div>
+
+<script src="../assets/data.js"></script>
+<script src="script.js"></script>
+<script>
+  document.getElementById("studioTag").textContent = STUDIO.name + " INTERIOR";
+  renderProject("ap-tower");
+</script>
+</body>
+</html>

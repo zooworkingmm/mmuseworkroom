@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Portfolio Builder</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="b-layout">
+
+  <!-- LEFT : project list -->
+  <aside class="b-side">
+    <div class="b-side-inner">
+      <header class="b-side-head">
+        <h1 class="b-title">PORTFOLIO BUILDER</h1>
+        <p class="b-sub">폴더의 사진으로 상세 페이지를 만듭니다</p>
+      </header>
+
+      <button type="button" class="b-btn b-btn-new" id="btnNewProject">+ 새 프로젝트</button>
+
+      <nav class="b-projects" id="projectList"></nav>
+
+      <div class="b-pending" id="pendingSection" hidden>
+        <p class="b-pending-title">새 폴더 발견</p>
+        <div class="b-pending-list" id="pendingList"></div>
+      </div>
+
+      <div class="b-side-foot">
+        <button type="button" class="b-btn b-btn-publish" id="btnPublish">발행 (data.js 저장)</button>
+        <p class="b-status" id="publishStatus"></p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER : editor -->
+  <main class="b-editor" id="editor">
+    <p class="b-empty">왼쪽에서 프로젝트를 선택하거나, "+ 새 프로젝트"로 시작하세요.</p>
+  </main>
+
+  <!-- RIGHT : live preview -->
+  <aside class="b-preview">
+    <div class="b-preview-head">
+      <span>LIVE PREVIEW</span>
+      <div class="b-preview-modes">
+        <button type="button" class="mode-btn active" id="modeDesktop" data-mode="desktop">Desktop</button>
+        <button type="button" class="mode-btn" id="modeMobile" data-mode="mobile">Mobile</button>
+      </div>
+    </div>
+    <div class="b-preview-scroll">
+      <div class="b-preview-frame" id="previewFrame"></div>
+    </div>
+  </aside>
+
+</div>
+
+<input type="file" id="fileInput" accept="image/*" multiple hidden />
+<input type="file" id="folderInput" webkitdirectory directory multiple hidden />
+
+<script src="../assets/data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
