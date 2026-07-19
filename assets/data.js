@@ -24,7 +24,7 @@ const PROJECTS = [
     "year": "2026",
     "location": "서울",
     "summary": "다이닝 라운지부터 컨퍼런스 룸까지, 레지던스 입주민을 위한 커뮤니티 공간을 설계했습니다.",
-    "description": "원형 대리석 테이블과 곡선 천장 조명이 중심을 이루는 다이닝 라운지를 시작으로, 우드 슬랫 파티션의 엘리베이터 로비, 통유리 컨퍼런스 라운지, 루프탑 테라스까지 하나의 동선으로 이어지는 커뮤니티 시설을 계획했습니다. 차분한 톤의 마감재와 절제된 조명 계획으로 고급 레지던스에 어울리는 품격을 담았습니다.",
+    "description": "곡선 천장 조명과 원형 대리석 테이블이 중심을 이루는 다이닝 라운지를 시작으로, 엘리베이터 로비와 컨퍼런스 라운지, 루프탑 테라스까지 이어지는 커뮤니티 동선을 계획했습니다. 차분한 톤의 마감재와 절제된 조명 계획으로 고급 레지던스에 어울리는 품격을 담았습니다.",
     "facts": {
       "client": "OOO",
       "site": "Seoul, Korea",
@@ -39,23 +39,23 @@ const PROJECTS = [
     "images": [
       {
         "src": "../assets/images/ap-tower/04.jpg",
-        "caption": "++"
+        "caption": "노을이 지는 시간, 도심을 내려다보며 머무는 야외 라운지"
       },
       {
         "src": "../assets/images/ap-tower/01.jpg",
-        "caption": "++",
+        "caption": "곡선 조명 아래 8인용 원형 테이블을 둔 다이닝 공간",
         "captionHidden": false,
         "cols": 1,
         "body": ""
       },
       {
         "src": "../assets/images/ap-tower/02.jpg",
-        "caption": "++",
+        "caption": "우드 슬랫 파티션으로 마감한 로비 동선",
         "cols": 1
       },
       {
         "src": "../assets/images/ap-tower/03.jpg",
-        "caption": "++"
+        "caption": "통유리 너머 도시 전망을 담은 회의 공간"
       }
     ]
   },

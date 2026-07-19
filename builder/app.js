@@ -510,6 +510,11 @@
         if (r.type) project.type = r.type;
         if (r.summary) project.summary = r.summary;
         if (r.description) project.description = r.description;
+        if (Array.isArray(r.bodyCaptions)) {
+          r.bodyCaptions.forEach((cap, i) => {
+            if (project.images[i] && cap) project.images[i].body = cap;
+          });
+        }
         if (Array.isArray(r.captions)) {
           r.captions.forEach((cap, i) => {
             if (project.images[i] && cap) project.images[i].caption = cap;
