@@ -233,6 +233,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         payload = self._read_json()
         studio = payload.get("studio", {})
         projects = payload.get("projects", [])
+        commit_message = payload.get("commitMessage") or "Update portfolio data"
 
         js = []
         js.append("/*")
@@ -249,7 +250,45 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         with open(DATA_JS, "w", encoding="utf-8") as f:
             f.write("\n".join(js))
 
-        self._send_json({"ok": True})
+        git_result = self._git_publish(commit_message)
+        self._send_json({"ok": True, "git": git_result})
+
+    def _run_git(self, args):
+        return subprocess.run(
+            ["git", "-C", ROOT] + args,
+            capture_output=True,
+            text=True,
+        )
+
+    def _git_publish(self, commit_message):
+        if not os.path.isdir(os.path.join(ROOT, ".git")):
+            return {"committed": False, "pushed": False, "note": "git 저장소가 아직 초기화되지 않았습니다"}
+
+        add_res = self._run_git(["add", "-A"])
+        if add_res.returncode != 0:
+            return {"committed": False, "pushed": False, "note": "git add 실패: " + add_res.stderr.strip()}
+
+        commit_res = self._run_git(["commit", "-m", commit_message])
+        committed = commit_res.returncode == 0
+        note = None
+        if not committed:
+            note = "커밋할 변경사항이 없습니다" if "nothing to commit" in (commit_res.stdout + commit_res.stderr) else commit_res.stderr.strip()
+
+        remote_res = self._run_git(["remote"])
+        has_remote = "origin" in remote_res.stdout.split()
+        if not has_remote:
+            return {"committed": committed, "pushed": False, "note": note or "origin 리모트가 설정되지 않았습니다"}
+
+        push_res = self._run_git(["push", "origin", "HEAD"])
+        pushed = push_res.returncode == 0
+        push_note = None if pushed else push_res.stderr.strip()
+
+        return {
+            "committed": committed,
+            "pushed": pushed,
+            "note": note,
+            "pushError": push_note,
+        }
 
     def _job_path(self, project_id):
         return os.path.join(JOBS_DIR, "%s.json" % slugify(project_id))
