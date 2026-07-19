@@ -81,27 +81,33 @@ const PROJECTS = [
     "images": [
       {
         "src": "../assets/images/centropolis/01.jpg",
-        "caption": "몰 입구 미디어 파사드"
+        "caption": "CENTROPOLIS 사인과 에스컬레이터가 만나는 몰 입구, 우드 루버와 레드 포인트 컬러로 야간 파사드를 완성했다",
+        "body": "몰 입구 미디어 파사드"
       },
       {
         "src": "../assets/images/centropolis/02.jpg",
-        "caption": "포레스트 미디어 월"
+        "caption": "숲의 형상을 담은 미디어 월이 만들어내는 로비의 첫 인상",
+        "body": "포레스트 미디어 월"
       },
       {
         "src": "../assets/images/centropolis/03.jpg",
-        "caption": "라운지"
+        "caption": "짙은 톤 마감과 간접조명으로 차분하게 정리한 라운지 공간",
+        "body": "라운지"
       },
       {
         "src": "../assets/images/centropolis/04.jpg",
-        "caption": "웰니스 센터"
+        "caption": "짙은 톤 마감재로 절제된 무드를 담은 웰니스 센터 입구",
+        "body": "웰니스 센터"
       },
       {
         "src": "../assets/images/centropolis/05.jpg",
-        "caption": "웰니스 센터 · 러닝존"
+        "caption": "러닝 머신이 늘어선 웰니스 센터의 러닝존",
+        "body": "웰니스 센터 · 러닝존"
       },
       {
         "src": "../assets/images/centropolis/06.jpg",
-        "caption": "웰니스 센터 · 웨이트존"
+        "caption": "웨이트 존 전용으로 계획한 트레이닝 공간",
+        "body": "웰니스 센터 · 웨이트존"
       }
     ]
   },
