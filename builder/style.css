@@ -426,8 +426,6 @@ input, textarea{ font-family:inherit; color:inherit; }
 .cap-eye-toggle.is-hidden{ opacity:0.5; }
 
 .cap-box-preview{
-  display:inline-block;
-  max-width:100%;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
@@ -438,24 +436,20 @@ input, textarea{ font-family:inherit; color:inherit; }
   cursor:text;
   flex:1;
   min-width:0;
+  outline:none;
 }
-.cap-box-preview:hover{ border-color:var(--ink); }
+.cap-box-preview:hover,
+.cap-box-preview:focus{ border-color:var(--ink); }
+
+.cap-box-preview:empty::before{
+  content:attr(data-placeholder);
+  color:var(--sub);
+}
 
 .cap-box.caption-off .cap-box-preview{
   opacity:0.45;
   border-style:solid;
 }
-
-.cap-box-input{
-  border:none;
-  border-bottom:var(--line);
-  background:none;
-  padding:6px 2px;
-  font-size:11px;
-  width:100%;
-  flex:1;
-}
-.cap-box-input:focus{ outline:none; border-bottom:1px solid var(--ink); }
 
 .eye-toggle{
   border:none;

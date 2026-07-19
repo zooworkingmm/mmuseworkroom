@@ -120,7 +120,7 @@
         const item = document.createElement("figure");
         item.className = "feed-item";
         const isSummary = visI === 0;
-        const bodyText = isSummary ? project.summary : img.body || img.caption;
+        const bodyText = img.body || img.caption || (isSummary ? project.summary : "");
         const popupText = img.caption;
         const isVideo = img.type === "video" || /\.(mp4|mov|m4v|webm)$/i.test(img.src);
         const dataAttrs = `data-caption="${popupText || ""}" data-project-id="${project.id}" data-image-index="${idx}" data-caption-off="${img.captionHidden ? "1" : ""}"`;

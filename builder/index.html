@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Portfolio Builder</title>
-<link rel="stylesheet" href="style.css?v=5" />
+<link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
 
@@ -57,7 +57,84 @@
 <input type="file" id="fileInput" accept="image/*" multiple hidden />
 <input type="file" id="folderInput" webkitdirectory directory multiple hidden />
 
-<script src="../assets/data.js?v=5"></script>
-<script src="app.js?v=5"></script>
+<!-- Generate modal -->
+<div class="gen-overlay" id="genOverlay" hidden>
+  <div class="gen-modal">
+    <div class="gen-head">
+      <div>
+        <h2>Generate</h2>
+        <p class="gen-sub" id="genSub">PROJECT NAME</p>
+      </div>
+      <button type="button" class="gen-close" id="genClose">×</button>
+    </div>
+
+    <div class="gen-body">
+      <div class="gen-section">
+        <p class="gen-label">TONE REFERENCE <span>톤 레퍼런스</span></p>
+        <div class="gen-pills" data-group="tone">
+          <button type="button" class="gen-pill active" data-value="standard">Standard<span>스탠다드</span></button>
+          <button type="button" class="gen-pill" data-value="side">Side (잡담)<span>사이드</span></button>
+        </div>
+      </div>
+
+      <div class="gen-section">
+        <p class="gen-label">VOICE <span>어투</span></p>
+        <div class="gen-pills" data-group="voice">
+          <button type="button" class="gen-pill active" data-value="auto">Auto<span>자동</span></button>
+          <button type="button" class="gen-pill" data-value="observer">1st observer<span>관찰자</span></button>
+          <button type="button" class="gen-pill" data-value="third">3rd person<span>3인칭</span></button>
+          <button type="button" class="gen-pill" data-value="essay">Essay<span>에세이</span></button>
+          <button type="button" class="gen-pill" data-value="interview">Interview<span>인터뷰</span></button>
+        </div>
+      </div>
+
+      <div class="gen-section">
+        <p class="gen-label">LENGTH <span>길이</span></p>
+        <div class="gen-pills" data-group="length">
+          <button type="button" class="gen-pill" data-value="short">Short<span>짧게</span></button>
+          <button type="button" class="gen-pill active" data-value="medium">Medium<span>중간</span></button>
+          <button type="button" class="gen-pill" data-value="long">Long<span>길게</span></button>
+        </div>
+      </div>
+
+      <div class="gen-section">
+        <p class="gen-label">STRUCTURE <span>구조</span></p>
+        <div class="gen-pills" data-group="structure">
+          <button type="button" class="gen-pill active" data-value="three-acts">Three acts<span>3막</span></button>
+          <button type="button" class="gen-pill" data-value="vignettes">Vignettes<span>비네트</span></button>
+          <button type="button" class="gen-pill" data-value="single-scene">Single scene<span>단일 장면</span></button>
+        </div>
+      </div>
+
+      <div class="gen-section">
+        <p class="gen-label">PHOTO FLOW <span>사진 흐름</span></p>
+        <div class="gen-pills" data-group="photoFlow">
+          <button type="button" class="gen-pill active" data-value="match-writing">Match writing<span>글에 맞춤</span></button>
+          <button type="button" class="gen-pill" data-value="chronological">Chronological<span>시간순</span></button>
+          <button type="button" class="gen-pill" data-value="detail-wide">Detail → wide<span>디테일→와이드</span></button>
+          <button type="button" class="gen-pill" data-value="wide-detail">Wide → detail<span>와이드→디테일</span></button>
+        </div>
+      </div>
+
+      <div class="gen-section">
+        <label class="gen-label" for="genEmphasis">EMPHASIS <span>강조</span></label>
+        <textarea id="genEmphasis" rows="3" placeholder="강조하고 싶은 내용을 적어주세요"></textarea>
+      </div>
+
+      <div class="gen-section">
+        <label class="gen-label" for="genToneNotes">TONE NOTES <span>추가 톤 메모</span></label>
+        <textarea id="genToneNotes" rows="2" placeholder="자유 텍스트로 어조 보강"></textarea>
+      </div>
+    </div>
+
+    <div class="gen-foot">
+      <button type="button" class="b-btn" id="genCancel">Cancel</button>
+      <button type="button" class="b-btn b-btn-generate" id="genSubmit">Generate</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/data.js?v=6"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

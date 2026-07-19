@@ -38,23 +38,24 @@ const PROJECTS = [
     },
     "images": [
       {
+        "src": "../assets/images/ap-tower/04.jpg",
+        "caption": "엘베홀부터 어두운 느낌이 들도록 디자인 했다"
+      },
+      {
         "src": "../assets/images/ap-tower/01.jpg",
-        "caption": "다이닝 라운지",
+        "caption": "",
         "captionHidden": false,
         "cols": 1,
-        "body": "ㅇㅇㅇㅇㅇ"
+        "body": ""
       },
       {
         "src": "../assets/images/ap-tower/02.jpg",
-        "caption": "엘리베이터 로비"
+        "caption": "엘리베이터 로비",
+        "cols": 1
       },
       {
         "src": "../assets/images/ap-tower/03.jpg",
         "caption": "컨퍼런스 라운지"
-      },
-      {
-        "src": "../assets/images/ap-tower/04.jpg",
-        "caption": "루프탑 테라스"
       }
     ]
   },
