@@ -39,7 +39,10 @@ const PROJECTS = [
     "images": [
       {
         "src": "../assets/images/ap-tower/01.jpg",
-        "caption": "다이닝 라운지"
+        "caption": "다이닝 라운지",
+        "captionHidden": false,
+        "cols": 1,
+        "body": "ㅇㅇㅇㅇㅇ"
       },
       {
         "src": "../assets/images/ap-tower/02.jpg",

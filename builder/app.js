@@ -72,6 +72,10 @@
     return groups;
   }
 
+  function visibleImages(images) {
+    return images.filter((img) => !img.hidden);
+  }
+
   // ---------- LEFT : project list ----------
 
   function renderProjectList() {
@@ -417,19 +421,31 @@
 
     project.images.forEach((img, i) => {
       const card = document.createElement("div");
-      card.className = "b-photo-card";
+      card.className = "b-photo-card" + (img.hidden ? " photo-hidden" : "");
       card.dataset.index = i;
       const cols = img.cols || 1;
       const isVideo = img.type === "video" || /\.(mp4|mov|m4v|webm)$/i.test(img.src);
       const thumbHtml = isVideo
         ? `<video src="${img.src}" muted></video>`
         : `<img src="${img.src}" alt="" />`;
-      const captionPlaceholder =
-        i === 0 ? "첫 사진은 '한 줄 소개'가 대신 표시됩니다" : "사진 클릭 시 뜨는 설명 텍스트";
+      const previewText = img.caption ? escapeHtml(img.caption) : "+ 캡션 추가 (사진 클릭 시 뜨는 설명)";
+      const bodyPlaceholder = i === 0 ? "비워두면 '한 줄 소개'가 대신 표시됨" : "사진 아래 항상 보이는 설명";
       card.innerHTML = `
         <span class="drag-handle" draggable="true" title="드래그해서 순서 변경">⠿</span>
         ${thumbHtml}
-        <input type="text" class="caption-input" placeholder="${captionPlaceholder}" value="${escapeAttr(img.caption)}" />
+        <div class="photo-fields">
+          <div class="field-line">
+            <label>본문</label>
+            <input type="text" class="body-input" placeholder="${bodyPlaceholder}" value="${escapeAttr(img.body || "")}" />
+          </div>
+          <div class="field-line cap-box ${img.captionHidden ? "caption-off" : ""}">
+            <label>히든박스</label>
+            <button type="button" class="cap-eye-toggle ${img.captionHidden ? "is-hidden" : ""}" title="캡션 팝업 표시/숨김">${img.captionHidden ? "—" : "00"}</button>
+            <span class="cap-box-preview">${previewText}</span>
+            <input type="text" class="cap-box-input" value="${escapeAttr(img.caption)}" hidden />
+          </div>
+        </div>
+        <button type="button" class="eye-toggle ${img.hidden ? "is-hidden" : ""}" title="사진 자체를 사이트에 표시/숨김">${img.hidden ? "—" : "00"}</button>
         <div class="b-cols">
           <button type="button" data-cols="1" class="${cols === 1 ? "active" : ""}">1</button>
           <button type="button" data-cols="2" class="${cols === 2 ? "active" : ""}">2</button>
@@ -438,8 +454,45 @@
         <button type="button" class="b-photo-del" title="삭제">×</button>
       `;
 
-      card.querySelector(".caption-input").addEventListener("input", (e) => {
-        img.caption = e.target.value;
+      card.querySelector(".body-input").addEventListener("input", (e) => {
+        img.body = e.target.value;
+        renderPreview();
+      });
+
+      const capBox = card.querySelector(".cap-box");
+      const capPreview = card.querySelector(".cap-box-preview");
+      const capInput = card.querySelector(".cap-box-input");
+      capPreview.addEventListener("click", () => {
+        capPreview.hidden = true;
+        capInput.hidden = false;
+        capInput.focus();
+        capInput.select();
+      });
+      const commitCaption = () => {
+        img.caption = capInput.value;
+        capPreview.textContent = img.caption ? img.caption : "+ 캡션 추가 (사진 클릭 시 뜨는 설명)";
+        capInput.hidden = true;
+        capPreview.hidden = false;
+        renderPreview();
+      };
+      capInput.addEventListener("blur", commitCaption);
+      capInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") capInput.blur();
+      });
+
+      card.querySelector(".cap-eye-toggle").addEventListener("click", (e) => {
+        img.captionHidden = !img.captionHidden;
+        capBox.classList.toggle("caption-off", !!img.captionHidden);
+        e.target.classList.toggle("is-hidden", !!img.captionHidden);
+        e.target.textContent = img.captionHidden ? "—" : "00";
+        renderPreview();
+      });
+
+      card.querySelector(".eye-toggle").addEventListener("click", (e) => {
+        img.hidden = !img.hidden;
+        card.classList.toggle("photo-hidden", !!img.hidden);
+        e.target.classList.toggle("is-hidden", !!img.hidden);
+        e.target.textContent = img.hidden ? "—" : "00";
         renderPreview();
       });
 
@@ -563,13 +616,13 @@
     const factsHtml = factLines.map(([k, v]) => `<p>${escapeHtml(k)} : ${escapeHtml(v)}</p>`).join("");
 
     let globalIndex = 0;
-    const groups = groupImagesByCols(project.images);
+    const groups = groupImagesByCols(visibleImages(project.images));
     const rowsHtml = groups
       .map((group) => {
         const itemsHtml = group.items
           .map((img) => {
             const isFirst = globalIndex === 0;
-            const capText = isFirst ? project.summary : img.caption;
+            const capText = isFirst ? project.summary : img.body || img.caption;
             const isVideo = img.type === "video" || /\.(mp4|mov|m4v|webm)$/i.test(img.src);
             const mediaHtml = isVideo
               ? `<video src="${img.src}" controls muted></video>`

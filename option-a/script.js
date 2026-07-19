@@ -92,15 +92,15 @@
     `;
   }
 
-  function groupImagesByCols(images) {
+  function groupImagesByCols(entries) {
     const groups = [];
-    images.forEach((img) => {
-      const cols = img.cols || 1;
+    entries.forEach((entry) => {
+      const cols = entry.img.cols || 1;
       const last = groups[groups.length - 1];
       if (last && last.cols === cols && last.items.length < cols) {
-        last.items.push(img);
+        last.items.push(entry);
       } else {
-        groups.push({ cols, items: [img] });
+        groups.push({ cols, items: [entry] });
       }
     });
     return groups;
@@ -108,32 +108,36 @@
 
   function renderFeed(project) {
     viewerFeed.innerHTML = "";
-    let i = 0;
-    groupImagesByCols(project.images).forEach((group) => {
+    const visible = project.images
+      .map((img, idx) => ({ img, idx }))
+      .filter((entry) => !entry.img.hidden);
+    let visI = 0;
+    groupImagesByCols(visible).forEach((group) => {
       const row = document.createElement("div");
       row.className = "feed-row";
       row.style.gridTemplateColumns = `repeat(${group.cols}, 1fr)`;
-      group.items.forEach((img) => {
+      group.items.forEach(({ img, idx }) => {
         const item = document.createElement("figure");
         item.className = "feed-item";
-        const isSummary = i === 0;
-        const capText = isSummary ? project.summary : img.caption;
+        const isSummary = visI === 0;
+        const bodyText = isSummary ? project.summary : img.body || img.caption;
+        const popupText = img.caption;
         const isVideo = img.type === "video" || /\.(mp4|mov|m4v|webm)$/i.test(img.src);
-        const dataAttrs = `data-caption="${capText}" data-project-id="${project.id}" data-image-index="${i}" data-is-summary="${isSummary ? "1" : ""}"`;
+        const dataAttrs = `data-caption="${popupText || ""}" data-project-id="${project.id}" data-image-index="${idx}" data-caption-off="${img.captionHidden ? "1" : ""}"`;
         const mediaHtml = isVideo
           ? `<video class="feed-img" src="${img.src}" ${dataAttrs} controls muted playsinline></video>`
-          : `<img class="feed-img" src="${img.src}" alt="${capText}" ${dataAttrs} loading="lazy" />`;
+          : `<img class="feed-img" src="${img.src}" alt="${bodyText || ""}" ${dataAttrs} loading="lazy" />`;
         item.innerHTML = `
           <div class="feed-image-wrap">
             ${mediaHtml}
           </div>
           <figcaption class="viewer-caption">
-            <span class="cap-index">${pad2(i)}</span>
-            <p class="cap-text">${capText}</p>
+            <span class="cap-index">${pad2(visI)}</span>
+            <p class="cap-text">${bodyText || ""}</p>
           </figcaption>
         `;
         row.appendChild(item);
-        i++;
+        visI++;
       });
       viewerFeed.appendChild(row);
     });
@@ -190,7 +194,7 @@
     document.addEventListener("mouseover", (e) => {
       if (cursorTip.classList.contains("expanded")) return;
       const photo = e.target.closest(".feed-img");
-      if (photo) {
+      if (photo && !photo.dataset.captionOff) {
         cursorTipText.textContent = photo.dataset.caption || "";
         cursorTip.classList.add("visible");
       }
@@ -208,7 +212,7 @@
 
     document.addEventListener("click", (e) => {
       const photo = e.target.closest(".feed-img");
-      if (photo) {
+      if (photo && !photo.dataset.captionOff) {
         activeTarget = photo;
         cursorTip.style.left = e.clientX + "px";
         cursorTip.style.top = e.clientY + "px";
@@ -240,16 +244,13 @@
       const newCaption = cursorTipText.textContent.trim();
       const projectId = activeTarget.dataset.projectId;
       const imageIndex = Number(activeTarget.dataset.imageIndex);
-      const isSummary = !!activeTarget.dataset.isSummary;
       activeTarget.dataset.caption = newCaption;
-      activeTarget.setAttribute("alt", newCaption);
-      const captionEl = activeTarget.closest(".feed-item")?.querySelector(".cap-text");
-      if (captionEl) captionEl.textContent = newCaption;
-      if (isSummary) PROJECTS.find((p) => p.id === projectId).summary = newCaption;
+      const project = PROJECTS.find((p) => p.id === projectId);
+      if (project && project.images[imageIndex]) project.images[imageIndex].caption = newCaption;
       fetch("/api/update-caption", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, imageIndex, isSummary, caption: newCaption }),
+        body: JSON.stringify({ projectId, imageIndex, isSummary: false, caption: newCaption }),
       }).catch(() => {});
       activeTarget = null;
     });
