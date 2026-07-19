@@ -236,6 +236,7 @@
       <div class="b-generate-row">
         <p style="color:var(--sub);font-size:10px;margin:0;">ID: ${escapeHtml(project.id)}</p>
         <button type="button" class="b-btn b-btn-generate" id="btnGenerate">✦ Generate</button>
+        <button type="button" class="b-btn b-btn-publish-project" id="btnPublishProject">Publish</button>
         <span class="b-generate-status" id="generateStatus"></span>
       </div>
 
@@ -307,6 +308,9 @@
     document.getElementById("btnAddPhotos").addEventListener("click", () => fileInput.click());
     document.getElementById("btnAddFolder").addEventListener("click", () => folderInput.click());
     document.getElementById("btnGenerate").addEventListener("click", () => startGenerate(project));
+    document.getElementById("btnPublishProject").addEventListener("click", () => {
+      publishSite("Update " + (project.name || project.id), document.getElementById("generateStatus"));
+    });
 
     const dropzone = document.getElementById("photoDropzone");
     dropzone.addEventListener("dragover", (e) => {
@@ -610,24 +614,35 @@
     });
   }
 
-  // ---------- publish ----------
+  // ---------- publish (data.js 저장 + git commit/push) ----------
 
-  document.getElementById("btnPublish").addEventListener("click", async () => {
-    publishStatus.textContent = "저장 중...";
+  async function publishSite(commitMessage, statusEl) {
+    const setStatus = (text) => {
+      if (statusEl) statusEl.textContent = text;
+      publishStatus.textContent = text;
+    };
+    setStatus("저장 중...");
     try {
       const res = await fetch("/api/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studio: state.studio, projects: state.projects }),
+        body: JSON.stringify({ studio: state.studio, projects: state.projects, commitMessage }),
       });
       const data = await res.json();
-      publishStatus.textContent = data.ok
-        ? "저장 완료 (" + new Date().toLocaleTimeString() + ")"
-        : "실패: " + (data.error || "알 수 없는 오류");
+      if (!data.ok) {
+        setStatus("실패: " + (data.error || "알 수 없는 오류"));
+        return;
+      }
+      const g = data.git || {};
+      let text = "저장 완료 (" + new Date().toLocaleTimeString() + ")";
+      if (g.pushed) text += " · GitHub에 push됨";
+      else if (g.note) text += " · " + g.note;
+      else if (g.pushError) text += " · push 실패: " + g.pushError;
+      setStatus(text);
     } catch (err) {
-      publishStatus.textContent = "실패: " + err.message;
+      setStatus("실패: " + err.message);
     }
-  });
+  }
 
   // 드롭존 밖에 파일을 놓쳐도 브라우저가 그 파일을 열어버리지 않도록 방지
   window.addEventListener("dragover", (e) => e.preventDefault());

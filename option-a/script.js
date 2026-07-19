@@ -116,11 +116,13 @@
       group.items.forEach((img) => {
         const item = document.createElement("figure");
         item.className = "feed-item";
-        const capText = i === 0 ? project.summary : img.caption;
+        const isSummary = i === 0;
+        const capText = isSummary ? project.summary : img.caption;
         const isVideo = img.type === "video" || /\.(mp4|mov|m4v|webm)$/i.test(img.src);
+        const dataAttrs = `data-caption="${capText}" data-project-id="${project.id}" data-image-index="${i}" data-is-summary="${isSummary ? "1" : ""}"`;
         const mediaHtml = isVideo
-          ? `<video class="feed-img" src="${img.src}" data-caption="${capText}" controls muted playsinline></video>`
-          : `<img class="feed-img" src="${img.src}" alt="${capText}" data-caption="${capText}" loading="lazy" />`;
+          ? `<video class="feed-img" src="${img.src}" ${dataAttrs} controls muted playsinline></video>`
+          : `<img class="feed-img" src="${img.src}" alt="${capText}" ${dataAttrs} loading="lazy" />`;
         item.innerHTML = `
           <div class="feed-image-wrap">
             ${mediaHtml}
@@ -170,34 +172,86 @@
     });
   }
 
-  // caption tooltip that follows the cursor while hovering a photo
+  // caption tooltip that follows the cursor while hovering a photo;
+  // click opens it and lets you edit + save the caption directly
   const cursorTip = document.getElementById("cursorTip");
   const cursorTipText = document.getElementById("cursorTipText");
   if (cursorTip && cursorTipText) {
+    let activeTarget = null;
+
+    const isInTip = (el) => el && cursorTip.contains(el);
+
     document.addEventListener("mousemove", (e) => {
+      if (cursorTip.classList.contains("expanded")) return;
       cursorTip.style.left = e.clientX + "px";
       cursorTip.style.top = e.clientY + "px";
     });
+
     document.addEventListener("mouseover", (e) => {
+      if (cursorTip.classList.contains("expanded")) return;
       const photo = e.target.closest(".feed-img");
       if (photo) {
         cursorTipText.textContent = photo.dataset.caption || "";
         cursorTip.classList.add("visible");
-        cursorTip.classList.remove("expanded");
       }
     });
+
     document.addEventListener("mouseout", (e) => {
+      if (cursorTip.classList.contains("expanded")) return;
       const leavingPhoto = e.target.closest(".feed-img");
-      const enteringPhoto = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".feed-img");
+      const enteringPhoto =
+        e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".feed-img");
       if (leavingPhoto && !enteringPhoto) {
         cursorTip.classList.remove("visible");
-        cursorTip.classList.remove("expanded");
       }
     });
+
     document.addEventListener("click", (e) => {
-      if (e.target.closest(".feed-img")) {
-        cursorTip.classList.toggle("expanded");
+      const photo = e.target.closest(".feed-img");
+      if (photo) {
+        activeTarget = photo;
+        cursorTip.style.left = e.clientX + "px";
+        cursorTip.style.top = e.clientY + "px";
+        cursorTip.classList.add("visible", "expanded");
+        cursorTipText.textContent = photo.dataset.caption || "";
+        requestAnimationFrame(() => {
+          cursorTipText.focus();
+          const range = document.createRange();
+          range.selectNodeContents(cursorTipText);
+          range.collapse(false);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        });
+        return;
       }
+      if (cursorTip.classList.contains("expanded") && !isInTip(e.target)) {
+        cursorTipText.blur();
+      }
+    });
+
+    cursorTipText.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") cursorTipText.blur();
+    });
+
+    cursorTipText.addEventListener("blur", () => {
+      cursorTip.classList.remove("expanded", "visible");
+      if (!activeTarget) return;
+      const newCaption = cursorTipText.textContent.trim();
+      const projectId = activeTarget.dataset.projectId;
+      const imageIndex = Number(activeTarget.dataset.imageIndex);
+      const isSummary = !!activeTarget.dataset.isSummary;
+      activeTarget.dataset.caption = newCaption;
+      activeTarget.setAttribute("alt", newCaption);
+      const captionEl = activeTarget.closest(".feed-item")?.querySelector(".cap-text");
+      if (captionEl) captionEl.textContent = newCaption;
+      if (isSummary) PROJECTS.find((p) => p.id === projectId).summary = newCaption;
+      fetch("/api/update-caption", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, imageIndex, isSummary, caption: newCaption }),
+      }).catch(() => {});
+      activeTarget = null;
     });
   }
 

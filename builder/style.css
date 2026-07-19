@@ -221,6 +221,8 @@ input, textarea{ font-family:inherit; color:inherit; }
 }
 .b-btn-generate:hover{ background:var(--sub); border-color:var(--sub); }
 
+.b-btn-publish-project:hover{ background:var(--ink); color:var(--bg); }
+
 .b-generate-status{
   font-size:9.5px;
   color:var(--sub);

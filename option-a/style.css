@@ -372,6 +372,7 @@ a{ color:inherit; }
   height:auto;
   max-width:240px;
   padding:6px 8px;
+  pointer-events:auto;
 }
 
 .cursor-tip-hint{
@@ -402,6 +403,9 @@ a{ color:inherit; }
 
 .cursor-tip.expanded .cursor-tip-text{
   display:block;
+  cursor:text;
+  outline:none;
+  white-space:pre-wrap;
 }
 
 /* ---------- circular scroll indicator (replaces default scrollbar thumb) ---------- */

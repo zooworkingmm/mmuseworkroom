@@ -91,6 +91,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._handle_import_folder()
             elif self.path == "/api/generate-request":
                 self._handle_generate_request()
+            elif self.path == "/api/update-caption":
+                self._handle_update_caption()
             else:
                 self._send_json({"error": "not found"}, 404)
         except Exception as e:
@@ -235,6 +237,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         projects = payload.get("projects", [])
         commit_message = payload.get("commitMessage") or "Update portfolio data"
 
+        self._write_data_js(studio, projects)
+        git_result = self._git_publish(commit_message)
+        self._send_json({"ok": True, "git": git_result})
+
+    def _write_data_js(self, studio, projects):
         js = []
         js.append("/*")
         js.append("  포트폴리오 공용 데이터 파일")
@@ -250,7 +257,38 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         with open(DATA_JS, "w", encoding="utf-8") as f:
             f.write("\n".join(js))
 
-        git_result = self._git_publish(commit_message)
+    def _read_data_js(self):
+        with open(DATA_JS, "r", encoding="utf-8") as f:
+            text = f.read()
+        m = re.search(r"const STUDIO = (\{.*?\});\s*const PROJECTS = (\[.*\]);", text, re.DOTALL)
+        if not m:
+            raise ValueError("data.js 형식을 읽을 수 없습니다")
+        return json.loads(m.group(1)), json.loads(m.group(2))
+
+    def _handle_update_caption(self):
+        payload = self._read_json()
+        project_id = payload.get("projectId", "")
+        image_index = payload.get("imageIndex")
+        caption = payload.get("caption", "")
+        is_summary = bool(payload.get("isSummary"))
+
+        studio, projects = self._read_data_js()
+        project = next((p for p in projects if p.get("id") == project_id), None)
+        if project is None:
+            self._send_json({"error": "project not found"}, 404)
+            return
+
+        if is_summary:
+            project["summary"] = caption
+        else:
+            images = project.get("images", [])
+            if image_index is None or not (0 <= image_index < len(images)):
+                self._send_json({"error": "invalid imageIndex"}, 400)
+                return
+            images[image_index]["caption"] = caption
+
+        self._write_data_js(studio, projects)
+        git_result = self._git_publish("Update caption: %s" % (project.get("name") or project_id))
         self._send_json({"ok": True, "git": git_result})
 
     def _run_git(self, args):
