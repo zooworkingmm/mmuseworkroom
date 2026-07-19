@@ -105,7 +105,7 @@ const PROJECTS = [
     "id": "sagewood",
     "name": "SAGEWOOD",
     "type": "호스피탈리티 · 리조트",
-    "year": "2025",
+    "year": "2026",
     "location": "여수",
     "summary": "여수 경도의 자연을 마주한 리조트, 로비부터 스파까지 전 공간을 디자인했습니다.",
     "description": "",
