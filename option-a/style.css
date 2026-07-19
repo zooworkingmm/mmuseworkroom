@@ -285,12 +285,6 @@ a{ color:inherit; }
   max-width:calc(60ch + var(--pad) * 2);
 }
 
-.cap-index{
-  font-size:var(--fs);
-  color:var(--sub);
-  padding-top:2px;
-}
-
 .cap-text{
   font-size:10.5px;
   line-height:1.7;
