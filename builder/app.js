@@ -57,6 +57,10 @@
     });
   });
 
+  document.getElementById("btnSaveIntro").addEventListener("click", () => {
+    publishSite("Update studio intro", document.getElementById("introStatus"));
+  });
+
   function pad2(n) {
     return String(n + 1).padStart(2, "0");
   }
