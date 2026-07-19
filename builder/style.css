@@ -374,28 +374,22 @@ input, textarea{ font-family:inherit; color:inherit; }
 }
 .b-photo-card .caption-input:focus{ outline:none; border-bottom:1px solid var(--ink); }
 
-.b-cols-field{
+.b-cols{
   display:flex;
-  align-items:center;
-  gap:6px;
+  gap:4px;
 }
 
-.b-cols-field label{
-  font-size:9px;
-  color:var(--sub);
-  letter-spacing:0.04em;
-}
-
-.cols-input{
-  width:36px;
+.b-cols button{
+  width:26px;
+  height:26px;
   border:1px solid var(--ink);
   background:none;
   color:var(--ink);
-  font-size:11px;
-  text-align:center;
-  padding:5px 2px;
+  font-size:10px;
+  cursor:pointer;
 }
-.cols-input:focus{ outline:none; }
+
+.b-cols button.active{ background:var(--ink); color:var(--bg); }
 
 .b-photo-del{
   border:none;
