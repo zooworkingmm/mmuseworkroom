@@ -430,9 +430,10 @@
         <span class="drag-handle" draggable="true" title="드래그해서 순서 변경">⠿</span>
         ${thumbHtml}
         <input type="text" class="caption-input" placeholder="${captionPlaceholder}" value="${escapeAttr(img.caption)}" />
-        <div class="b-cols-field">
-          <label>열</label>
-          <input type="number" class="cols-input" min="1" max="4" value="${cols}" />
+        <div class="b-cols">
+          <button type="button" data-cols="1" class="${cols === 1 ? "active" : ""}">1</button>
+          <button type="button" data-cols="2" class="${cols === 2 ? "active" : ""}">2</button>
+          <button type="button" data-cols="3" class="${cols === 3 ? "active" : ""}">3</button>
         </div>
         <button type="button" class="b-photo-del" title="삭제">×</button>
       `;
@@ -442,12 +443,12 @@
         renderPreview();
       });
 
-      card.querySelector(".cols-input").addEventListener("input", (e) => {
-        let n = Math.round(Number(e.target.value));
-        if (Number.isNaN(n)) n = 1;
-        n = Math.max(1, Math.min(4, n));
-        img.cols = n;
-        renderPreview();
+      card.querySelectorAll(".b-cols button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          img.cols = Number(btn.dataset.cols);
+          card.querySelectorAll(".b-cols button").forEach((b) => b.classList.toggle("active", b === btn));
+          renderPreview();
+        });
       });
 
       card.querySelector(".b-photo-del").addEventListener("click", () => {
