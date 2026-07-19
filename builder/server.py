@@ -298,6 +298,37 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             text=True,
         )
 
+    def _scan_staged_for_secrets(self):
+        """스테이징된 파일에서 흔한 시크릿 패턴을 찾는다. 문제 있으면 발견 목록을 반환."""
+        patterns = [
+            (r"-----BEGIN [A-Z ]*PRIVATE KEY-----", "private key"),
+            (r"AKIA[0-9A-Z]{16}", "AWS access key"),
+            (r"sk-ant-[A-Za-z0-9\-_]{20,}", "Anthropic API key"),
+            (r"sk-[A-Za-z0-9]{20,}", "OpenAI-style API key"),
+            (r"ghp_[A-Za-z0-9]{30,}", "GitHub token"),
+            (r"xox[baprs]-[A-Za-z0-9\-]{10,}", "Slack token"),
+            (r"AIza[0-9A-Za-z\-_]{35}", "Google API key"),
+            (r"(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*[\"'][^\"'\s]{8,}[\"']", "hardcoded credential"),
+        ]
+        diff_res = self._run_git(["diff", "--cached", "-U0", "--"])
+        text = diff_res.stdout or ""
+        findings = []
+        for pattern, label in patterns:
+            if re.search(pattern, text):
+                findings.append(label)
+
+        names_res = self._run_git(["diff", "--cached", "--name-only"])
+        for name in names_res.stdout.splitlines():
+            base = os.path.basename(name)
+            if base in (".env", ".env.local") or base.endswith(".pem") or base.endswith(".key"):
+                findings.append("sensitive filename: " + name)
+
+        seen = []
+        for f in findings:
+            if f not in seen:
+                seen.append(f)
+        return seen
+
     def _git_publish(self, commit_message):
         if not os.path.isdir(os.path.join(ROOT, ".git")):
             return {"committed": False, "pushed": False, "note": "git 저장소가 아직 초기화되지 않았습니다"}
@@ -305,6 +336,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         add_res = self._run_git(["add", "-A"])
         if add_res.returncode != 0:
             return {"committed": False, "pushed": False, "note": "git add 실패: " + add_res.stderr.strip()}
+
+        secret_findings = self._scan_staged_for_secrets()
+        if secret_findings:
+            self._run_git(["reset"])
+            return {
+                "committed": False,
+                "pushed": False,
+                "note": "커밋 차단됨 — 민감한 정보 감지: " + ", ".join(secret_findings),
+                "blocked": True,
+            }
 
         commit_res = self._run_git(["commit", "-m", commit_message])
         committed = commit_res.returncode == 0
@@ -341,7 +382,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         job = {
             "status": "pending",
             "progress": 0,
-            "step": "대기 중 — Claude Code 세션이 감지하면 시작됩니다",
+            "step": "대기 중 — 1분 이내에 자동으로 처리됩니다",
             "projectId": project_id,
             "hints": payload.get("hints", {}),
             "requestedAt": time.time(),

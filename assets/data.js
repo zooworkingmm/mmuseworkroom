@@ -5,14 +5,14 @@
 */
 
 const STUDIO = {
-  "name": "OOO",
-  "role": "INTERIOR DESIGNER",
+  "name": "mmuseworkroom",
+  "role": "space designer",
   "desc": "IPSUM LOREM SIT CONSORTIUM",
-  "address": "서울특별시 OO구 OO로 00",
-  "phone": "010.0000.0000",
-  "email": "INFO@SAMPLE.COM",
-  "site": "WWW.SAMPLE.SITE",
-  "sns": "@SAMPLE",
+  "address": "@mmuseworkroom",
+  "phone": "010-2848-7707",
+  "email": "zooworking.mm@gmail.com",
+  "site": "www.mmuseworkroom.xyz",
+  "sns": "",
   "about": "공간을 사용하는 사람의 동선과 시간을 먼저 관찰합니다. 재료와 빛, 여백의 균형을 통해 오래 머물고 싶은 공간을 만듭니다. 레지던스, 상업시설, 호스피탈리티 공간을 중심으로 작업합니다."
 };
 

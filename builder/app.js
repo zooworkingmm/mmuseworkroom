@@ -396,14 +396,93 @@
   const genToneNotes = document.getElementById("genToneNotes");
   let genTargetProject = null;
 
+  const TONE_BUILTINS = [
+    { value: "standard", label: "Standard", sub: "스탠다드" },
+    { value: "side", label: "Side (잡담)", sub: "사이드" },
+  ];
+
+  function getGroupValue(name) {
+    const group = genOverlay.querySelector(`.gen-pills[data-group="${name}"]`);
+    const active = group && group.querySelector(".gen-pill.active:not(.gen-pill-add)");
+    return active ? active.dataset.value : "";
+  }
+
+  function getMultiGroupValues(name) {
+    const group = genOverlay.querySelector(`.gen-pills[data-group="${name}"]`);
+    if (!group) return [];
+    return Array.from(group.querySelectorAll(".gen-pill.active:not(.gen-pill-add)")).map((b) => b.dataset.value);
+  }
+
+  function collectCurrentHints() {
+    return {
+      voice: getGroupValue("voice"),
+      length: getGroupValue("length"),
+      structure: getGroupValue("structure"),
+      photoFlow: getGroupValue("photoFlow"),
+      emphasis: genEmphasis.value.trim(),
+      toneNotes: genToneNotes.value.trim(),
+    };
+  }
+
+  function applyHintsToModal(hints) {
+    if (!hints) return;
+    ["voice", "length", "structure", "photoFlow"].forEach((groupName) => {
+      if (!hints[groupName]) return;
+      const group = genOverlay.querySelector(`.gen-pills[data-group="${groupName}"]`);
+      if (!group) return;
+      group.querySelectorAll(".gen-pill").forEach((b) => {
+        b.classList.toggle("active", b.dataset.value === hints[groupName]);
+      });
+    });
+    genEmphasis.value = hints.emphasis || "";
+    genToneNotes.value = hints.toneNotes || "";
+  }
+
+  function renderTonePills(selectedValue) {
+    const genTonePills = document.getElementById("genTonePills");
+    const customs = state.studio.toneReferences || [];
+    genTonePills.innerHTML =
+      TONE_BUILTINS.map(
+        (t) =>
+          `<button type="button" class="gen-pill${t.value === selectedValue ? " active" : ""}" data-value="${t.value}">${t.label}<span>${t.sub}</span></button>`
+      ).join("") +
+      customs
+        .map(
+          (t, i) =>
+            `<button type="button" class="gen-pill${t.value === selectedValue ? " active" : ""}" data-value="${escapeAttr(t.value)}" data-custom-index="${i}">${escapeHtml(t.name)}<span>커스텀</span></button>`
+        )
+        .join("") +
+      `<button type="button" class="gen-pill gen-pill-add" id="genToneAdd" title="현재 설정을 새 톤으로 저장">+</button>`;
+
+    genTonePills.querySelectorAll(".gen-pill:not(.gen-pill-add)").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        genTonePills.querySelectorAll(".gen-pill").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const idx = btn.dataset.customIndex;
+        if (idx !== undefined && customs[idx]) applyHintsToModal(customs[idx].hints);
+      });
+    });
+    document.getElementById("genToneAdd").addEventListener("click", () => {
+      const name = prompt("이 설정을 어떤 이름의 톤으로 저장할까요?");
+      if (!name || !name.trim()) return;
+      const value = "custom-" + Date.now();
+      state.studio.toneReferences = state.studio.toneReferences || [];
+      state.studio.toneReferences.push({ name: name.trim(), value, hints: collectCurrentHints() });
+      renderTonePills(value);
+    });
+  }
+
   function openGenerateModal(project) {
     genTargetProject = project;
     genSub.textContent = (project.name || project.id).toUpperCase();
     genEmphasis.value = "";
     genToneNotes.value = "";
+    renderTonePills("standard");
     genOverlay.querySelectorAll(".gen-pills").forEach((group) => {
+      if (group.dataset.group === "tone") return;
       const buttons = group.querySelectorAll(".gen-pill");
-      buttons.forEach((b, i) => b.classList.toggle("active", i === 0));
+      const isMulti = group.dataset.multi === "1";
+      buttons.forEach((b, i) => b.classList.toggle("active", isMulti ? true : i === 0));
     });
     genOverlay.hidden = false;
   }
@@ -414,9 +493,15 @@
   }
 
   genOverlay.querySelectorAll(".gen-pills").forEach((group) => {
+    if (group.dataset.group === "tone") return;
+    const isMulti = group.dataset.multi === "1";
     group.querySelectorAll(".gen-pill").forEach((btn) => {
       btn.addEventListener("click", () => {
-        group.querySelectorAll(".gen-pill").forEach((b) => b.classList.toggle("active", b === btn));
+        if (isMulti) {
+          btn.classList.toggle("active");
+        } else {
+          group.querySelectorAll(".gen-pill").forEach((b) => b.classList.toggle("active", b === btn));
+        }
       });
     });
   });
@@ -429,20 +514,10 @@
 
   document.getElementById("genSubmit").addEventListener("click", () => {
     if (!genTargetProject) return;
-    const getGroupValue = (name) => {
-      const group = genOverlay.querySelector(`.gen-pills[data-group="${name}"]`);
-      const active = group && group.querySelector(".gen-pill.active");
-      return active ? active.dataset.value : "";
-    };
-    const extraHints = {
-      tone: getGroupValue("tone"),
-      voice: getGroupValue("voice"),
-      length: getGroupValue("length"),
-      structure: getGroupValue("structure"),
-      photoFlow: getGroupValue("photoFlow"),
-      emphasis: genEmphasis.value.trim(),
-      toneNotes: genToneNotes.value.trim(),
-    };
+    const extraHints = Object.assign(
+      { tone: getGroupValue("tone"), targets: getMultiGroupValues("target") },
+      collectCurrentHints()
+    );
     const project = genTargetProject;
     closeGenerateModal();
     startGenerate(project, extraHints);
@@ -474,7 +549,7 @@
       setGenerateStatus("요청 실패: " + err.message);
       return;
     }
-    setGenerateStatus("요청됨 — 이 창을 열어둔 Claude Code 세션이 처리합니다...");
+    setGenerateStatus("요청됨 — 1분 이내에 자동으로 처리됩니다...");
     setGenerateProgress(true);
     generatePollTimer = setInterval(() => pollGenerate(project.id), 3000);
     pollGenerate(project.id);
@@ -562,7 +637,6 @@
             <div class="cap-box-preview" contenteditable="true" data-placeholder="+ 캡션 추가 (사진 클릭 시 뜨는 설명)">${escapeHtml(img.caption || "")}</div>
           </div>
         </div>
-        <button type="button" class="eye-toggle ${img.hidden ? "is-hidden" : ""}" title="사진 자체를 사이트에 표시/숨김">${img.hidden ? "—" : "00"}</button>
         <div class="b-cols">
           <button type="button" data-cols="1" class="${cols === 1 ? "active" : ""}">1</button>
           <button type="button" data-cols="2" class="${cols === 2 ? "active" : ""}">2</button>
@@ -594,14 +668,6 @@
         capBox.classList.toggle("caption-off", !!img.captionHidden);
         e.target.classList.toggle("is-hidden", !!img.captionHidden);
         e.target.textContent = img.captionHidden ? "—" : "00";
-        renderPreview();
-      });
-
-      card.querySelector(".eye-toggle").addEventListener("click", (e) => {
-        img.hidden = !img.hidden;
-        card.classList.toggle("photo-hidden", !!img.hidden);
-        e.target.classList.toggle("is-hidden", !!img.hidden);
-        e.target.textContent = img.hidden ? "—" : "00";
         renderPreview();
       });
 

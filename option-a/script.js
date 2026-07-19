@@ -132,7 +132,6 @@
             ${mediaHtml}
           </div>
           <figcaption class="viewer-caption">
-            <span class="cap-index">${pad2(visI)}</span>
             <p class="cap-text">${bodyText || ""}</p>
           </figcaption>
         `;
