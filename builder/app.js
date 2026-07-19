@@ -274,20 +274,16 @@
     editor.innerHTML = `
       <div class="b-generate-row">
         <p style="color:var(--sub);font-size:10px;margin:0;">ID: ${escapeHtml(project.id)}</p>
-        <button type="button" class="b-btn b-btn-generate" id="btnGenerate">✦ Generate</button>
+        <button type="button" class="b-btn b-btn-generate" id="btnGenerate" title="Generate">+Generator</button>
         <button type="button" class="b-btn b-btn-publish-project" id="btnPublishProject">Publish</button>
         <span class="b-generate-progress" id="generateProgress" hidden>
-          <svg class="dog-walk" viewBox="0 0 16 12" shape-rendering="crispEdges">
-            <rect x="3" y="4" width="9" height="4" />
-            <rect x="11" y="2" width="4" height="4" />
-            <rect x="13" y="1" width="2" height="1" />
-            <rect x="15" y="4" width="1" height="1" />
-            <rect x="1" y="3" width="2" height="1" />
-            <rect x="0" y="2" width="1" height="1" />
-            <rect x="10" y="8" width="1" height="3" />
-            <rect x="8" y="8" width="1" height="3" />
-            <rect x="5" y="8" width="1" height="3" />
-            <rect x="3" y="8" width="1" height="3" />
+          <svg class="dog-walk" viewBox="0 0 16 10" shape-rendering="crispEdges">
+            <rect x="2" y="4" width="8" height="5" />
+            <rect x="8" y="1" width="5" height="5" />
+            <rect x="13" y="3" width="2" height="1" />
+            <rect x="0" y="5" width="2" height="2" />
+            <rect x="4" y="9" width="2" height="1" />
+            <rect x="7" y="9" width="2" height="1" />
           </svg>
         </span>
         <span class="b-generate-status" id="generateStatus"></span>

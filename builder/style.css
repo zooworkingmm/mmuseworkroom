@@ -62,12 +62,50 @@ input, textarea{ font-family:inherit; color:inherit; }
   min-height:100%;
 }
 
+.b-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 0 20px;
+}
+
 .b-title{
   font-family:var(--title-font);
   font-size:13px;
   font-weight:700;
   letter-spacing:0.04em;
-  margin:0 0 6px;
+  margin:0;
+}
+
+.b-home-btn{
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;
+  height:22px;
+  color:var(--ink);
+  text-decoration:none;
+}
+
+.b-home-btn svg{
+  display:block;
+}
+
+.b-home-body,
+.b-home-door{
+  transition:fill .15s ease;
+}
+
+.b-home-btn:hover .b-home-body{
+  fill:var(--ink);
+  stroke:var(--ink);
+}
+
+.b-home-btn:hover .b-home-door{
+  fill:var(--bg);
+  stroke:var(--ink);
 }
 
 .b-sub{
@@ -245,6 +283,10 @@ input, textarea{ font-family:inherit; color:inherit; }
   background:var(--ink);
   color:var(--bg);
   border-color:var(--ink);
+  text-align:center;
+  font-size:12px;
+  line-height:1;
+  padding:8px 14px;
 }
 .b-btn-generate:hover{ background:var(--sub); border-color:var(--sub); }
 
@@ -270,7 +312,7 @@ input, textarea{ font-family:inherit; color:inherit; }
   top:0;
   left:0;
   width:16px;
-  height:12px;
+  height:10px;
   fill:var(--ink);
   animation:dogWalk 1.6s ease-in-out infinite;
 }
