@@ -2,10 +2,7 @@
   document.getElementById("studioName").textContent = STUDIO.name;
   document.getElementById("studioRole").textContent = STUDIO.role;
   document.getElementById("studioAddress").textContent = STUDIO.address;
-  document.getElementById("studioPhone").textContent = STUDIO.phone;
-  document.getElementById("studioEmail").textContent = STUDIO.email;
   document.getElementById("studioSite").textContent = STUDIO.site;
-  document.getElementById("studioSns").textContent = STUDIO.sns;
 
   const workList = document.getElementById("workList");
   const metaName = document.getElementById("metaName");
