@@ -311,7 +311,7 @@
 
     document.getElementById("btnAddPhotos").addEventListener("click", () => fileInput.click());
     document.getElementById("btnAddFolder").addEventListener("click", () => folderInput.click());
-    document.getElementById("btnGenerate").addEventListener("click", () => startGenerate(project));
+    document.getElementById("btnGenerate").addEventListener("click", () => openGenerateModal(project));
     document.getElementById("btnPublishProject").addEventListener("click", () => {
       publishSite("Update " + (project.name || project.id), document.getElementById("generateStatus"));
     });
@@ -342,7 +342,67 @@
     if (el) el.textContent = text;
   }
 
-  async function startGenerate(project) {
+  // ---------- Generate modal ----------
+
+  const genOverlay = document.getElementById("genOverlay");
+  const genSub = document.getElementById("genSub");
+  const genEmphasis = document.getElementById("genEmphasis");
+  const genToneNotes = document.getElementById("genToneNotes");
+  let genTargetProject = null;
+
+  function openGenerateModal(project) {
+    genTargetProject = project;
+    genSub.textContent = (project.name || project.id).toUpperCase();
+    genEmphasis.value = "";
+    genToneNotes.value = "";
+    genOverlay.querySelectorAll(".gen-pills").forEach((group) => {
+      const buttons = group.querySelectorAll(".gen-pill");
+      buttons.forEach((b, i) => b.classList.toggle("active", i === 0));
+    });
+    genOverlay.hidden = false;
+  }
+
+  function closeGenerateModal() {
+    genOverlay.hidden = true;
+    genTargetProject = null;
+  }
+
+  genOverlay.querySelectorAll(".gen-pills").forEach((group) => {
+    group.querySelectorAll(".gen-pill").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        group.querySelectorAll(".gen-pill").forEach((b) => b.classList.toggle("active", b === btn));
+      });
+    });
+  });
+
+  document.getElementById("genClose").addEventListener("click", closeGenerateModal);
+  document.getElementById("genCancel").addEventListener("click", closeGenerateModal);
+  genOverlay.addEventListener("click", (e) => {
+    if (e.target === genOverlay) closeGenerateModal();
+  });
+
+  document.getElementById("genSubmit").addEventListener("click", () => {
+    if (!genTargetProject) return;
+    const getGroupValue = (name) => {
+      const group = genOverlay.querySelector(`.gen-pills[data-group="${name}"]`);
+      const active = group && group.querySelector(".gen-pill.active");
+      return active ? active.dataset.value : "";
+    };
+    const extraHints = {
+      tone: getGroupValue("tone"),
+      voice: getGroupValue("voice"),
+      length: getGroupValue("length"),
+      structure: getGroupValue("structure"),
+      photoFlow: getGroupValue("photoFlow"),
+      emphasis: genEmphasis.value.trim(),
+      toneNotes: genToneNotes.value.trim(),
+    };
+    const project = genTargetProject;
+    closeGenerateModal();
+    startGenerate(project, extraHints);
+  });
+
+  async function startGenerate(project, extraHints) {
     if (generatePollTimer) {
       clearInterval(generatePollTimer);
       generatePollTimer = null;
@@ -353,12 +413,15 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId: project.id,
-          hints: {
-            name: project.name,
-            type: project.type,
-            year: project.year,
-            location: project.location,
-          },
+          hints: Object.assign(
+            {
+              name: project.name,
+              type: project.type,
+              year: project.year,
+              location: project.location,
+            },
+            extraHints || {}
+          ),
         }),
       });
     } catch (err) {
